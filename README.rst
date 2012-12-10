@@ -26,7 +26,12 @@ In your ``setup.py``::
 
     from setuptools import setup, find_packages
 
-    from req import find_requirements
+    try:
+        from req import find_requirements
+    except ImportError:
+        # Dummy implementation used when pip runs egg_info command
+        # (before installation)
+        def find_requirements(*a, **k): []
 
     setup(
         name='my-package',
