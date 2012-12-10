@@ -1,5 +1,2 @@
 mox
-pep8
-its
 unittest2
-nose

@@ -72,10 +72,10 @@ class TestGetRequirementsFilenames(unittest.TestCase):
                      version=sys.version_info))
 
         self.assertIn('requirements.txt', names)
-        self.assertIn('requirements-%s.txt' % sys.version_info.major, names)
+        self.assertIn('requirements-%s.txt' % sys.version_info[0], names)
 
         self.assertIn('prod-requirements.txt', names)
-        self.assertIn('prod-requirements-%s.txt' % sys.version_info.major,
+        self.assertIn('prod-requirements-%s.txt' % sys.version_info[0],
                       names)
 
     def test_version_as_str(self):
