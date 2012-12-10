@@ -7,13 +7,13 @@ import sys
 from pip import req
 
 
-def get_requirements_filenames(source_dir=None, prefix=None, version=None,
+def get_requirements_filenames(where=None, group=None, only=None, version=None,
                                extension='txt'):
-    """Produces requirements filenames based on prefix and interpreter version.
+    """Produces requirements filenames based on group and interpreter version.
 
     Filenames are following pattern:
 
-        [prefix-]?requirements[-version+]?.txt
+        [group-]?requirements[-version+]?.txt
 
     For instance, for prefix `devel` and `version` (2, 7, 3) it will produce:
 
@@ -27,45 +27,66 @@ def get_requirements_filenames(source_dir=None, prefix=None, version=None,
         devel-requirements-273.txt
 
     Args:
-        prefix: str, a prefix for requirements, like 'dev', 'devel', 'prod'
+        where: str, a base for filenames
+        group: str or list, a prefix for requirements, like 'dev', 'devel',
+            ['devel', 'prod']
+        only: str or list, the same as group, but setting this will ommit base
+            requirements
         version: an iterable, with version segments to use, using
             os.version_info by default
         extension: str, what extension to use, 'txt' by default
 
     Returns:
-        a sequence of filenames
+        a list of filenames
     """
-    prefixes = ['']
 
-    if prefix:
-        prefixes.append('%s-' % prefix)
+    if group is not None and only is not None:
+        raise ValueError('group and only arguments are mutually exclusive')
+
+    groups = ['']
+
+    if only is not None:
+        group = only
+        groups = []
+
+    if group is not None:
+        if not isinstance(group, list):
+            group = [group]
+
+        groups.extend('%s-' % g for g in group if g)
+
+    groups = [str(g) for g in groups]
 
     version = sys.version_info if version is None else version
     version = [str(v) for v in version if v and v != '.']
     version = [''] + ['-%s' % ''.join(version[:i + 1])
                       for i, v in enumerate(version)]
 
-    for p, v in itertools.product(prefixes, version):
-        filename = '%srequirements%s.%s' % (p, v, extension)
+    names = []
+    for g, v in itertools.product(groups, version):
+        filename = '%srequirements%s.%s' % (g, v, extension)
 
-        if source_dir:
-            filename = os.path.join(source_dir, filename)
+        if where:
+            filename = os.path.join(where, filename)
 
-        yield filename
+        names.append(filename)
+
+    return names
 
 
-def find_requirements(source_dir=None, prefix=None, version=None):
+def find_requirements(where=None, group=None, only=None, version=None):
     """Generates requirements based on given prefix and version.
 
-    It works similar to find_packages function. It accepts source_dir argument
+    It works similar to find_packages function. It accepts where argument
     and yields install requiremnets.
 
     Note that this function will not search for requirement files recursively -
     it expects that all files are in the same directory.
 
     Args:
-        source_dir: a directory where requirement files resides
-        prefix: a configuration prefix, like 'devel', 'prod'
+        where: a directory where requirement files resides
+        group: a configuration prefix, like 'devel', ['prod', 'stage']
+        only: the same as group, but will ommit base requiremnets
         version: what version of python to use, current by default
 
     Returns:
@@ -78,7 +99,8 @@ def find_requirements(source_dir=None, prefix=None, version=None):
 
     reqs = []
 
-    for filename in get_requirements_filenames(source_dir, prefix, version):
+    for filename in get_requirements_filenames(where=where, group=group,
+                                               only=only, version=version):
         if os.path.exists(filename):
             for install_req in req.parse_requirements(filename,
                                                       options=FakeOptions()):

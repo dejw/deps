@@ -36,12 +36,12 @@ class TestBase(unittest.TestCase):
 class TestGetRequirementsFilenames(unittest.TestCase):
 
     def test_empty(self):
-        names = list(req.get_requirements_filenames(prefix='', version=''))
+        names = list(req.get_requirements_filenames(group='', version=''))
 
         self.assertEqual(['requirements.txt'], names)
 
     def test_prefix_and_version(self):
-        names = list(req.get_requirements_filenames(prefix='devel',
+        names = list(req.get_requirements_filenames(group='devel',
                      version=(2, 7, 3)))
 
         self.assertEqual([
@@ -55,6 +55,8 @@ class TestGetRequirementsFilenames(unittest.TestCase):
             'devel-requirements-273.txt',
         ], names)
 
+        self.assertIsInstance(names, list)
+
     def test_no_prefix(self):
         names = list(req.get_requirements_filenames(version=(2, 7, 3)))
 
@@ -66,7 +68,7 @@ class TestGetRequirementsFilenames(unittest.TestCase):
         ], names)
 
     def test_version_info(self):
-        names = list(req.get_requirements_filenames(prefix='prod',
+        names = list(req.get_requirements_filenames(group='prod',
                      version=sys.version_info))
 
         self.assertIn('requirements.txt', names)
@@ -86,13 +88,41 @@ class TestGetRequirementsFilenames(unittest.TestCase):
         ], names)
 
     def test_source_dir(self):
-        names = list(req.get_requirements_filenames(source_dir="/tmp",
+        names = list(req.get_requirements_filenames(where="/tmp",
                      version="2"))
 
         self.assertEqual([
             '/tmp/requirements.txt',
             '/tmp/requirements-2.txt',
         ], names)
+
+    def test_group_with_list(self):
+        names = req.get_requirements_filenames(group=['a', 'b'], version='')
+
+        self.assertEqual([
+            'requirements.txt',
+            'a-requirements.txt',
+            'b-requirements.txt',
+        ], names)
+
+    def test_only(self):
+        names = req.get_requirements_filenames(only='setup', version='')
+
+        self.assertEqual([
+            'setup-requirements.txt',
+        ], names)
+
+    def test_only_with_list(self):
+        names = req.get_requirements_filenames(only=['a', 'b'], version='')
+
+        self.assertEqual([
+            'a-requirements.txt',
+            'b-requirements.txt',
+        ], names)
+
+    def test_only_and_group_ValueError(self):
+        with self.assertRaises(ValueError):
+            req.get_requirements_filenames(only='a', group='b')
 
 
 class TestFindRequirements(TestBase):
@@ -108,8 +138,9 @@ class TestFindRequirements(TestBase):
         ]
 
         self.mox.StubOutWithMock(req, 'get_requirements_filenames')
-        req.get_requirements_filenames(source_dir, prefix,
-                                       version).AndReturn(names)
+        req.get_requirements_filenames(
+            where=source_dir, only=None, group=prefix,
+            version=version).AndReturn(names)
 
         self.mox.StubOutWithMock(pip_req, 'parse_requirements')
         pip_req.parse_requirements(
@@ -121,7 +152,7 @@ class TestFindRequirements(TestBase):
 
         self.mox.ReplayAll()
 
-        reqs = req.find_requirements(source_dir, prefix, version)
+        reqs = req.find_requirements(source_dir, group=prefix, version=version)
 
         self.mox.VerifyAll()
         self.assertEqual(['some-package>1', 'other-package'], reqs)
