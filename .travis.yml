@@ -8,9 +8,9 @@ matrix:
     allow_failures:
         - python: "pypy"
 install:
-    - pip install -r dev-requirements.txt --use-mirrors
-    - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install --use-mirrors -r dev-requirements-2.txt; fi
-    - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pip install --use-mirrors -r dev-requirements-3.txt; fi
+    - pip install -r devel-requirements.txt --use-mirrors
+    - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install --use-mirrors -r devel-requirements-2.txt; fi
+    - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pip install --use-mirrors -r devel-requirements-3.txt; fi
     - pip install -e .
 script:
     - python -c 'import deps; print(deps.__version__)'
