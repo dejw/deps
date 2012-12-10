@@ -7,8 +7,8 @@ import sys
 from pip import req
 
 
-def get_requirements_filenames(where=None, group=None, only=None, version=None,
-                               extension='txt'):
+def get_requirement_filenames(where=None, group=None, only=None, version=None,
+                              extension='txt'):
     """Produces requirements filenames based on group and interpreter version.
 
     Filenames are following pattern:
@@ -58,7 +58,8 @@ def get_requirements_filenames(where=None, group=None, only=None, version=None,
     groups = [str(g) for g in groups]
 
     version = sys.version_info if version is None else version
-    version = [str(v) for v in version if v and v != '.']
+    version = map(str, version)
+    version = [v for v in version if v and v != '.']
     version = [''] + ['-%s' % ''.join(version[:i + 1])
                       for i, v in enumerate(version)]
 
@@ -99,8 +100,8 @@ def find_requirements(where=None, group=None, only=None, version=None):
 
     reqs = []
 
-    for filename in get_requirements_filenames(where=where, group=group,
-                                               only=only, version=version):
+    for filename in get_requirement_filenames(where=where, group=group,
+                                              only=only, version=version):
         if os.path.exists(filename):
             for install_req in req.parse_requirements(filename,
                                                       options=FakeOptions()):
