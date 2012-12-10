@@ -76,7 +76,12 @@ You can specify where your requirement files are::
     # get_requirement_filenames is used by find_packages internally
     >>> from req import get_requirement_filenames
     >>> get_requirement_filenames('deps')
-    # TODO(dejw): output
+    ['deps/requirements.txt',
+     'deps/requirements-2.txt',
+     'deps/requirements-27.txt',
+     'deps/requirements-273.txt',
+     'deps/requirements-273final.txt',
+     'deps/requirements-273final0.txt']
 
 Note that ``find_packages`` will not look for requirements recursively, it
 assumes instead that all files are in the same directory.
@@ -88,15 +93,25 @@ You can specify a dependency group (or groups) by adding ``group`` arguments
 respectively::
 
     >>> get_requirement_filenames(group='devel')
-    # TODO(dejw): output
+    ['requirements.txt',
+     'requirements-2.txt',
+     ... snip
+     'devel-requirements.txt',
+     'devel-requirements-2.txt',
+     ... snip]
     >>> get_requirement_filenames(group=['devel', 'ci'])
-    # TODO(dejw): output
+    ['requirements.txt',
+      ... snip
+     'devel-requirements.txt',
+      ... snip
+     'ci-requirements.txt'
+     ... snip]
 
 In order not to use base requirements you can use ``only`` attribute, which can
 be handy in following case::
 
     >>> get_requirement_filenames(only='setup') # also accepts a list
-    # TODO(dejw): output
+    ['setup-requirements.txt', ...]
 
 Prerequisites
 -------------
