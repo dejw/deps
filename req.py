@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+"""``req`` discovers your Python requirements."""
+
 import itertools
 import os
 import sys
 
 from pip import req
+
+__version__ = '0.1.0'
 
 
 def get_requirement_filenames(where=None, group=None, only=None, version=None,
