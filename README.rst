@@ -1,7 +1,7 @@
-req
-===
+deps
+====
 
-``req`` discovers your Python requirements.
+``deps`` discovers your Python requirements.
 
 Motivation
 ----------
@@ -17,7 +17,7 @@ In this case you probably would rather build requirement list dynamically in
 ``setup.py`` file. This leads to two dependency lists, which are very hard to
 keep synced.
 
-``req`` to the rescue!
+``deps`` for the rescue!
 
 Usage
 -----
@@ -27,7 +27,7 @@ In your ``setup.py``::
     from setuptools import setup, find_packages
 
     try:
-        from req import find_requirements
+        from deps import find_requirements
     except ImportError:
         # Dummy implementation used when pip runs egg_info command
         # (before installation)
@@ -38,7 +38,7 @@ In your ``setup.py``::
         packages=find_packages(),
 
         # Find requirements the same as you finds packages
-        setup_requires=['req'],
+        setup_requires=['deps'],
         install_requires=find_requirements(),
 
         # ...
@@ -79,7 +79,7 @@ With this in mind it is very easy to manage separate dependencies for Python
 You can specify where your requirement files are::
 
     # get_requirement_filenames is used by find_packages internally
-    >>> from req import get_requirement_filenames
+    >>> from deps import get_requirement_filenames
     >>> get_requirement_filenames('deps')
     ['deps/requirements.txt',
      'deps/requirements-2.txt',
@@ -121,5 +121,5 @@ be handy in following case::
 Prerequisites
 -------------
 
-``req`` requires only ``pip`` to work (which you probably already have
+``deps`` requires only ``pip`` to work (which you probably already have
 installed), besides standard library.

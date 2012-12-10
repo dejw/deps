@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""``req`` discovers your Python requirements."""
+"""deps discovers your Python requirements."""
 
 import itertools
 import os

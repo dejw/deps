@@ -18,9 +18,9 @@ except ImportError:
         raise
     import unittest
 
-from pip import req as pip_req
+from pip import req
 
-import req
+import deps
 
 
 class TestBase(unittest.TestCase):
@@ -36,12 +36,12 @@ class TestBase(unittest.TestCase):
 class TestGetRequirementsFilenames(unittest.TestCase):
 
     def test_empty(self):
-        names = list(req.get_requirement_filenames(group='', version=''))
+        names = list(deps.get_requirement_filenames(group='', version=''))
 
         self.assertEqual(['requirements.txt'], names)
 
     def test_prefix_and_version(self):
-        names = list(req.get_requirement_filenames(group='devel',
+        names = list(deps.get_requirement_filenames(group='devel',
                      version=(2, 7, 3)))
 
         self.assertEqual([
@@ -58,7 +58,7 @@ class TestGetRequirementsFilenames(unittest.TestCase):
         self.assertIsInstance(names, list)
 
     def test_no_prefix(self):
-        names = list(req.get_requirement_filenames(version=(2, 7, 3)))
+        names = list(deps.get_requirement_filenames(version=(2, 7, 3)))
 
         self.assertEqual([
             'requirements.txt',
@@ -68,7 +68,7 @@ class TestGetRequirementsFilenames(unittest.TestCase):
         ], names)
 
     def test_version_info(self):
-        names = list(req.get_requirement_filenames(group='prod',
+        names = list(deps.get_requirement_filenames(group='prod',
                      version=sys.version_info))
 
         self.assertIn('requirements.txt', names)
@@ -79,7 +79,7 @@ class TestGetRequirementsFilenames(unittest.TestCase):
                       names)
 
     def test_version_as_str(self):
-        names = list(req.get_requirement_filenames(version="2.1"))
+        names = list(deps.get_requirement_filenames(version="2.1"))
 
         self.assertEqual([
             'requirements.txt',
@@ -88,7 +88,7 @@ class TestGetRequirementsFilenames(unittest.TestCase):
         ], names)
 
     def test_source_dir(self):
-        names = list(req.get_requirement_filenames(where="/tmp",
+        names = list(deps.get_requirement_filenames(where="/tmp",
                      version="2"))
 
         self.assertEqual([
@@ -97,7 +97,7 @@ class TestGetRequirementsFilenames(unittest.TestCase):
         ], names)
 
     def test_group_with_list(self):
-        names = req.get_requirement_filenames(group=['a', 'b'], version='')
+        names = deps.get_requirement_filenames(group=['a', 'b'], version='')
 
         self.assertEqual([
             'requirements.txt',
@@ -106,14 +106,14 @@ class TestGetRequirementsFilenames(unittest.TestCase):
         ], names)
 
     def test_only(self):
-        names = req.get_requirement_filenames(only='setup', version='')
+        names = deps.get_requirement_filenames(only='setup', version='')
 
         self.assertEqual([
             'setup-requirements.txt',
         ], names)
 
     def test_only_with_list(self):
-        names = req.get_requirement_filenames(only=['a', 'b'], version='')
+        names = deps.get_requirement_filenames(only=['a', 'b'], version='')
 
         self.assertEqual([
             'a-requirements.txt',
@@ -122,10 +122,10 @@ class TestGetRequirementsFilenames(unittest.TestCase):
 
     def test_only_and_group_ValueError(self):
         with self.assertRaises(ValueError):
-            req.get_requirement_filenames(only='a', group='b')
+            deps.get_requirement_filenames(only='a', group='b')
 
     def test_zeros_should_be_included(self):
-        names = req.get_requirement_filenames(version=[1, 0, 1])
+        names = deps.get_requirement_filenames(version=[1, 0, 1])
 
         self.assertEqual([
             'requirements.txt',
@@ -143,17 +143,17 @@ class TestFindRequirements(TestBase):
         source_dir = 'source dir'
         names = ['requirements.txt']
         requirements = [
-            pip_req.InstallRequirement.from_line('some-package>1'),
-            pip_req.InstallRequirement.from_line('other-package'),
+            req.InstallRequirement.from_line('some-package>1'),
+            req.InstallRequirement.from_line('other-package'),
         ]
 
-        self.mox.StubOutWithMock(req, 'get_requirement_filenames')
-        req.get_requirement_filenames(
+        self.mox.StubOutWithMock(deps, 'get_requirement_filenames')
+        deps.get_requirement_filenames(
             where=source_dir, only=None, group=prefix,
             version=version).AndReturn(names)
 
-        self.mox.StubOutWithMock(pip_req, 'parse_requirements')
-        pip_req.parse_requirements(
+        self.mox.StubOutWithMock(req, 'parse_requirements')
+        req.parse_requirements(
             'requirements.txt',
             options=mox.IgnoreArg()).AndReturn(requirements)
 
@@ -162,7 +162,8 @@ class TestFindRequirements(TestBase):
 
         self.mox.ReplayAll()
 
-        reqs = req.find_requirements(source_dir, group=prefix, version=version)
+        reqs = deps.find_requirements(source_dir, group=prefix,
+                                      version=version)
 
         self.mox.VerifyAll()
         self.assertEqual(['some-package>1', 'other-package'], reqs)

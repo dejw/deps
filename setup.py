@@ -5,18 +5,18 @@ import os
 
 from setuptools import setup, find_packages
 
-import req
+import deps
 
 setup(
-    name='req',
-    version=req.__version__,
-    url='https://github.com/dejw/req/',
+    name='deps',
+    version=deps.__version__,
+    url='https://github.com/dejw/deps/',
     license='BSD',
     author='Dawid Fatyga',
     author_email='dawid.fatyga@gmail.com',
-    description='req discovers your Python dependencies',
-    long_description=req.__doc__,
-    py_modules=['req'],
+    description='deps discovers your Python dependencies',
+    long_description=deps.__doc__,
+    py_modules=['deps'],
     platforms='any',
     use_2to3=True,
     install_requies=['pip'],
