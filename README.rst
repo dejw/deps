@@ -1,6 +1,11 @@
 deps
 ====
 
+.. image:: https://secure.travis-ci.org/dejw/deps.png
+
+(`Travis <http://travis-ci.org/dejw/vip>`_)
+
+
 ``deps`` discovers your Python requirements.
 
 Motivation
