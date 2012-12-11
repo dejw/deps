@@ -34,16 +34,17 @@ In your ``setup.py``::
     try:
         from deps import find_requirements
     except ImportError:
-        # Dummy implementation used when pip runs egg_info command
-        # (before installation)
-        def find_requirements(*a, **k): []
+        # Download latest deps.py module, in order to be able to resolve
+        # dependencies *before* running any setup.py command.
+        import urllib
+        urllib.urlretrieve('https://raw.github.com/dejw/deps/master/deps.py', 'deps.py')
+        from deps import find_requirements
 
     setup(
         name='my-package',
         packages=find_packages(),
 
         # Find requirements the same as you finds packages
-        setup_requires=['deps'],
         install_requires=find_requirements(),
 
         # ...
