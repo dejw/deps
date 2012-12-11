@@ -1,6 +1,8 @@
 deps
 ====
 
+(Experimental and work in progress)
+
 .. image:: https://secure.travis-ci.org/dejw/deps.png
 
 (`Travis <http://travis-ci.org/dejw/deps>`_)
